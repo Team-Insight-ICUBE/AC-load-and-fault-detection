@@ -1,0 +1,91 @@
+//Project 1 - AC load and Fault Detection System
+
+#include<LiquidCrystal.h>
+LiquidCrystal lcd(12,11,5,4,3,2); //configuring the interface
+#include<SoftwareSerial.h>
+SoftwareSerial mySerial(9,10);
+byte tx = 1;
+
+int led = 7; //led interfacing
+const int SensorPin = A0; //input 1
+const int SensorPin1 = A1; //input 2
+int S = 0; //sensor value (Voltage)
+int S1 = 0; //sensor1 value
+
+void setup()
+{
+pinMode(tx, OUTPUT);
+lcd.begin(16,2); //lcd configuration
+delay(100); //delay
+pinMode(SensorPin, INPUT);
+pinMode(SensorPin1, INPUT);
+pinMode(led, OUTPUT);
+mySerial.begin(9600);
+Serial.begin(9600); //Start the serial connection with the computer
+}
+
+void loop()
+{
+  S = analogRead(SensorPin);
+  S1 = analogRead(SensorPin1);
+  delay(50);
+
+  if(S == 1023 && S1 == 0) //if there is a fault in the circuit
+  {
+    //For LED
+    digitalWrite(led, HIGH);
+    
+    // For LCD
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("FAULT DETECTED");
+    lcd.setCursor(0,1);
+    lcd.print("CHECK!!");
+    delay(100);
+    lcd.setCursor(0,1);
+    lcd.print("Sending SMS...");
+    delay(100);
+
+    // For GSM
+      mySerial.println("Sending Alert Message...");
+      delay(100);
+      mySerial.println("AT+CMGF=1\r");
+      delay(100);
+      mySerial.println("AT+CMGS=\"+919445723000\"\r");
+      mySerial.println("FAULT IN AC CIRCUIT!\r");
+      delay(200);
+      mySerial.println("AT+CMGS=\"+919445723000\"\r");
+      mySerial.println("FAULT IN AC CIRCUIT\r");
+      delay(200);
+      mySerial.println("AT+CMGS=\"+919445723000\"\r");
+      mySerial.println("FAULT IN AC CIRCUIT!\r");
+      delay(200);
+      mySerial.println((char)26); // End AT command with a ^Z, ASCII code 26
+      delay(100);
+
+  }
+   else if(S == 1023 && S1 == 1023) //if there is no fault
+  {
+ 
+    
+    // For LCD
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("AC IS ON");
+    lcd.setCursor(0,1);
+    lcd.print("Sending SMS...");
+    delay(100);
+    lcd.setCursor(0,1);
+    lcd.print("NO FAULT");
+    delay(100);
+  }
+
+  else //if the AC is Off
+  {
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("AC is OFF");
+    digitalWrite(led, LOW);
+    }
+  
+}
