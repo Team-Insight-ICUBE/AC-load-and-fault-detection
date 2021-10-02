@@ -73,11 +73,30 @@ void loop()
     lcd.setCursor(0,0);
     lcd.print("AC IS ON");
     lcd.setCursor(0,1);
-    lcd.print("Sending SMS...");
-    delay(100);
-    lcd.setCursor(0,1);
     lcd.print("NO FAULT");
     delay(100);
+    lcd.setCursor(0,1);
+    lcd.print("Sending SMS...");
+    delay(100);
+
+  //For GSM
+  mySerial.println("Sending Alert Message...");
+      delay(100);
+      mySerial.println("AT+CMGF=1\r");
+      delay(100);
+      mySerial.println("AT+CMGS=\"+919445723000\"\r");
+      mySerial.println("AC is ON\r");
+      delay(200);
+      mySerial.println("AT+CMGS=\"+919445723000\"\r");
+      mySerial.println("AC is ON\r");
+      delay(200);
+      mySerial.println("AT+CMGS=\"+919445723000\"\r");
+      mySerial.println("AC is ON\r");
+      delay(200);
+      mySerial.println((char)26); // End AT command with a ^Z, ASCII code 26
+      delay(100);
+
+    
   }
 
   else //if the AC is Off
